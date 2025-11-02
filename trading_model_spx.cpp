@@ -41,7 +41,7 @@ class Trader {
 };
 
 int main() {
-    
+    std::cout << "Trading Model: S&P 500 MA 200" << std::endl;
 
     return 0;
 }
