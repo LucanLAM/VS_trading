@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <ctime>
 
 struct Record {
     std::string date;
@@ -42,6 +43,27 @@ class Trader {
 
 int main() {
     std::cout << "Trading Model: S&P 500 MA 200" << std::endl;
+
+    // Start and end test date
+    struct tm datetime;
+    time_t enddate;
+    datetime.tm_year = 2025 - 1900; // Number of years since 1900
+    datetime.tm_mon = 10 - 1; // Number of months since January
+    datetime.tm_mday = 28;
+    datetime.tm_hour = 0; datetime.tm_min = 0; datetime.tm_sec = 0;
+    datetime.tm_isdst = -1;
+    enddate = mktime(&datetime);
+
+    time_t startdate;
+    datetime.tm_year = 2006 - 1900; // Number of years since 1900
+    datetime.tm_mon = 6 - 1; // Number of months since January
+    datetime.tm_mday = 23;
+    datetime.tm_hour = 0; datetime.tm_min = 0; datetime.tm_sec = 0;
+    datetime.tm_isdst = -1;
+    startdate = mktime(&datetime);
+
+    std::cout << "Simulation Start Date: " << ctime(&startdate) << std::endl;
+    std::cout << "Simulation End Date: " << ctime(&enddate) << std::endl;
 
     return 0;
 }
