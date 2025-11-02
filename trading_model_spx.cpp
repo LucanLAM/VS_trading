@@ -62,8 +62,24 @@ int main() {
     datetime.tm_isdst = -1;
     startdate = mktime(&datetime);
 
-    std::cout << "Simulation Start Date: " << ctime(&startdate) << std::endl;
-    std::cout << "Simulation End Date: " << ctime(&enddate) << std::endl;
+    time_t current_date;
+    datetime.tm_year = 2006 - 1900; // Number of years since 1900
+    datetime.tm_mon = 6 - 1; // Number of months since January
+    datetime.tm_mday = 23;
+    datetime.tm_hour = 0; datetime.tm_min = 0; datetime.tm_sec = 0;
+    datetime.tm_isdst = -1;
+    current_date = mktime(&datetime);
+
+    char output[50];
+    datetime = *localtime(&startdate);
+    strftime(output, 50, "%e %B, %Y", &datetime);
+    std::cout << "Simulation Start Date: " << output << std::endl;
+    datetime = *localtime(&enddate);
+    strftime(output, 50, "%e %B, %Y", &datetime);
+    std::cout << "Simulation End Date: " << output << std::endl;
+    datetime = *localtime(&current_date);
+    strftime(output, 50, "%e %B, %Y", &datetime);
+    std::cout << "Simulation current Date: " << output << std::endl;
 
     return 0;
 }
