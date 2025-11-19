@@ -30,7 +30,7 @@ struct trade_history {
 };
 
 class Trader {
-    std::string trade_model_name = "SPX DCA Trader";
+    std::string trade_model_name = "MA200 Trader";
     float cash = 1300;
     std::unordered_map<std::string, Position> holdings;
     std::vector<trade_history> history;
@@ -49,25 +49,27 @@ class Trader {
                 cash += monthly_deposit;
                 last_month = month;
             }
-            // Buy Condition: all in
-            // Assume but at 75% of H to L. In other word entry price = 0.75 * (H - L) + L
-            // Number of stock need to buy
-            double entry_price = 0.75 * (stock_data_day.high - stock_data_day.low) + stock_data_day.low;
-            int stock_buy = cash / entry_price;
-            if (stock_buy <= 0) return; // not enough cash
-            
-            double cost = stock_buy * entry_price;
-            
-            // Deduct Cash
-            cash -= cost;
-
-            // Add to holdings
-            holdings["SPY"].shares += stock_buy;
-            holdings["SPY"].total_cost += cost;
-
-            // Save to history
-            history.push_back({ stock_data_day.date, "SPY", stock_buy, cost });
+            // Buy Condition: price < MA200
+            if (stock_data_day.low < stock_data_day.ma200) {
+                // Assume but at 75% of H to L. In other word entry price = 0.75 * (H - L) + L
+                // Number of stock need to buy
+                double entry_price = 0.75 * (stock_data_day.high - stock_data_day.low) + stock_data_day.low;
+                int stock_buy = cash / entry_price;
+                if (stock_buy <= 0) return; // not enough cash
                 
+                double cost = stock_buy * entry_price;
+                
+                // Deduct Cash
+                cash -= cost;
+
+                // Add to holdings
+                holdings["SPY"].shares += stock_buy;
+                holdings["SPY"].total_cost += cost;
+
+                // Save to history
+                history.push_back({ stock_data_day.date, "SPY", stock_buy, cost });
+                
+            }
         }
 
         void output_states() {
@@ -98,66 +100,38 @@ class Trader {
 
 time_t parse_date_to_time_t(const std::string& date_str);
 std::vector<StockData> load_stock_data(const std::string& filename);
-void compute_MA200(std::vector<StockData>& data);
 
 int main() {
-    std::cout << "Trading Model: S&P 500 DCA" << std::endl;
+    std::cout << "Trading Model: S&P 500 MA 200" << std::endl;
 
     // Start and end test date
-    struct tm datetime;
-    time_t enddate;
-    datetime.tm_year = 2025 - 1900; // Number of years since 1900
-    datetime.tm_mon = 10 - 1; // Number of months since January
-    datetime.tm_mday = 28;
-    datetime.tm_hour = 0; datetime.tm_min = 0; datetime.tm_sec = 0;
-    datetime.tm_isdst = -1;
-    enddate = mktime(&datetime);
+    time_t enddate = parse_date_to_time_t("28/10/2025");
 
-    time_t startdate;
-    datetime.tm_year = 2006 - 1900; // Number of years since 1900
-    datetime.tm_mon = 6 - 1; // Number of months since January
-    datetime.tm_mday = 23;
-    datetime.tm_hour = 0; datetime.tm_min = 0; datetime.tm_sec = 0;
-    datetime.tm_isdst = -1;
-    startdate = mktime(&datetime);
+    time_t startdate = parse_date_to_time_t("23/06/2006");
 
-    char output[50];
-    datetime = *localtime(&startdate);
-    strftime(output, 50, "%e %B, %Y", &datetime);
-    std::cout << "Simulation Start Date: " << output << std::endl;
-    datetime = *localtime(&enddate);
-    strftime(output, 50, "%e %B, %Y", &datetime);
-    std::cout << "Simulation End Date: " << output << std::endl;
+    std::cout << "Start Date: ";
+    time_t_output(startdate);
+    std::cout << "\n";
+
+    std::cout << "End Date: ";
+    time_t_output(enddate);
+    std::cout << "\n";
 
     int time_diff_sec = difftime(enddate, startdate);
     int time_diff_days = time_diff_sec / (24 * 60 * 60);
     std::cout << "Time diff in days: " << time_diff_days << std::endl;
 
-    auto stock_data = load_stock_data("SPY_Historical_Data.csv");
-
-    // for (size_t i = 0; i < stock_data.size(); ++i) {
-    //
-    //     time_t date = stock_data[i].date;
-    //     double price = stock_data[i].price;
-    //     double open = stock_data[i].open;
-    //     double high = stock_data[i].high;
-    //     double low = stock_data[i].low;
-    //     double ma200 = stock_data[i].ma200;
-    //
-    //     datetime = *localtime(&date);
-    //     strftime(output, 50, "%e %B, %Y", &datetime);
-    //     std::cout << "Date: " << output << " ";
-    //
-    //     std::cout << price << " " << open << " " << high << " " << low << " " << ma200 << std::endl;
-    // }
-
+    auto stock_data_QQQ = load_stock_data("QQQ_Historical_Data.csv");
+    auto stock_data_QLD = load_stock_data("QQQ_Historical_Data.csv");
+    auto stock_data_TQQQ = load_stock_data("QQQ_Historical_Data.csv");
     Trader trader; // create an object
-    for (auto& stock_data_day : stock_data) {
-        if (stock_data_day.date < startdate) continue;
+    for (auto& QQQ_day : stock_data_QQQ) {
+        if (QQQ_day.date < startdate) continue;
 
-        if (stock_data_day.date > enddate) break;
+        if (QQQ_day.date > enddate) break;
 
-        trader.execute_trade(stock_data_day);
+
+        trader.execute_trade(QQQ_day);
         // Pause for debugging
         // std::cout << "Debug Start:--------------------------------------------------" << std::endl;
         // datetime = *localtime(&stock_data_day.date);
@@ -202,13 +176,10 @@ std::vector<StockData> load_stock_data(const std::string& filename) {
         record.open = std::stod(open);
         record.high = std::stod(high);
         record.low = std::stod(low);
-        record.ma200 = 0.0;  // placeholder for now
 
         data.push_back(record);
 
     }
-    
-    compute_MA200(data);
 
     return data;
 }
@@ -231,20 +202,10 @@ time_t parse_date_to_time_t(const std::string& date_str) {
     return mktime(&tm_date);
 }
 
-void compute_MA200(std::vector<StockData>& data) {
-    std::reverse(data.begin(), data.end());
-    const int window = 200;
-    double sum = 0.0;
-    for (size_t i = 0; i < data.size(); i++) {
-
-        sum += data[i].price;
-
-        if (i >= window)
-            sum -= data[i - window].price;
-
-        if (i >= window - 1)
-            data[i].ma200 = sum / window;
-        else
-            data[i].ma200 = 0.0; // insufficient data
-    }
+void time_t_output(const std::time_t& time) {
+    struct tm datetime;
+    char output[50];
+    datetime = *localtime(&time);
+    strftime(output, 50, "%e %B, %Y", &datetime);
+    std::cout << output;
 }

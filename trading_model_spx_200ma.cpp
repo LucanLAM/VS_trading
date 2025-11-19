@@ -29,7 +29,7 @@ struct trade_history {
     double cost;
 };
 
-class Trader_MA200 {
+class Trader {
     std::string trade_model_name = "MA200 Trader";
     float cash = 1300;
     std::unordered_map<std::string, Position> holdings;
@@ -153,7 +153,7 @@ int main() {
     //     std::cout << price << " " << open << " " << high << " " << low << " " << ma200 << std::endl;
     // }
 
-    Trader_MA200 trader; // create an object
+    Trader trader; // create an object
     for (auto& stock_data_day : stock_data) {
         if (stock_data_day.date < startdate) continue;
 
@@ -170,8 +170,6 @@ int main() {
         // std::cin.get(); // waits for Enter key
 
     }
-    datetime = *localtime(&enddate);
-    strftime(output, 50, "%e %B, %Y", &datetime);
     trader.output_states();
 
     return 0;
