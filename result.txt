@@ -1,0 +1,17 @@
+Trader 200 MA
+Time diff in days: 7067
+Cash: 6865.42
+SPY 1514 shares === market price:1,040,118
+total money invested 297,335
+original: 6865.42 + 297,335 = 304,200.42
+New     : 6865.42 + 1,040,118 = 1,046,983.42
+r = 0.0638422 or 6.38422%
+
+
+A = P * (1 + r/365) ^ (#_days), r = annual rate
+ln A = (#_days) * ln (P * (1 + r/365))
+ln A / (#_days) = ln P + ln (1 + r/365)
+ln (1 + r/365) = ln (A/P) / #_days
+1 + r/365 = e^(ln (A/P) / #_days)
+r/365 = e^(ln (A/P) / #_days) - 1
+r = 365 * e^(ln (A/P) / #_days) - 365
