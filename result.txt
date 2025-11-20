@@ -12,9 +12,29 @@ Time diff in days: 7067
 Cash: 399.54
 SPY 1566 shares === market price:1,075,842
 total money invested 303,800
-original: 399.54 + 303,800 = 304.199.54
+original: 399.54 + 303,800 = 304,199.54
 New     : 399.54 + 1,075,842 = 1,076,241.54
 r = 0.0652661 or 6.52661%
+
+Trader QQQ Fra Old m1
+Time diff in days: 7067
+Cash: 487.57
+Borrow Cash: -944,500
+QQQ 580 shares === market price: 632.91*580 = 367,087.8
+D_QQQ 14014 shares === market price: 632.91*14014 = 8,869,600.74
+original: 304,200
+New     : 487.57 - 944,500 + 367,087.8 + 8,869,600.74 = 8,292,676.11
+r = 0.170761 or 17.0761%
+
+Trader QQQ Fra New m1
+Time diff in days: 7067
+Cash: 487.57
+Borrow Cash: -976,471
+QQQ 409 shares === market price: 632.91*409 = 258,860.19
+D_QQQ 14356 shares === market price: 632.91*14356 = 9,086,055.96
+original: 304,200
+New     : 487.57 - 976,471 + 258,860.19 + 9,086,055.96 = 8,368,932.72
+r = 0.171234 or 17.1234%
 
 
 A = P * (1 + r/365) ^ (#_days), r = annual rate
